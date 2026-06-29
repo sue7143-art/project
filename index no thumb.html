@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>목마른 사슴 — 성경 이야기 시뮬레이션</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold:#F5C842;
+  --gold-dark:#c89010;
+  --bg:#08060e;
+  --bg2:#0d0b1a;
+  --text:#faebd0;
+  --muted:rgba(250,235,208,0.62);
+}
+html,body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Serif KR',serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+html{scroll-behavior:smooth;}
+
+/* ── HERO ── */
+#hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:60px 24px 80px;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 25% 25%,rgba(80,40,180,0.20) 0%,transparent 50%),
+    radial-gradient(ellipse at 75% 75%,rgba(180,120,10,0.14) 0%,transparent 50%),
+    var(--bg);
+}
+.stars{position:absolute;inset:0;z-index:0;pointer-events:none;}
+.star{position:absolute;border-radius:50%;background:#fff;
+  animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s);
+  opacity:var(--o,0.4);}
+@keyframes twinkle{0%,100%{opacity:var(--o);transform:scale(1);}50%{opacity:0.05;transform:scale(0.4);}}
+#hero>*:not(.stars){position:relative;z-index:1;}
+
+.hero-emblem{
+  font-size:clamp(3.2rem,8vw,5.5rem);
+  margin-bottom:18px;
+  animation:deerFloat 4s ease-in-out infinite;
+  filter:drop-shadow(0 0 28px rgba(245,200,66,0.55));
+}
+@keyframes deerFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-16px);}}
+
+.hero-label{
+  font-family:'Cinzel',serif;
+  font-size:clamp(0.58rem,1.4vw,0.72rem);
+  letter-spacing:0.40em;color:var(--gold);opacity:0.75;
+  text-transform:uppercase;margin-bottom:14px;
+}
+h1.hero-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(2.6rem,8vw,5.5rem);
+  font-weight:900;letter-spacing:0.04em;line-height:1.05;
+  background:linear-gradient(140deg,#fffbe8 0%,var(--gold) 45%,#ffe8a0 80%,#fff 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;
+}
+.hero-sub{
+  font-family:'Cinzel',serif;
+  font-size:clamp(0.74rem,1.8vw,0.98rem);
+  letter-spacing:0.22em;color:rgba(245,200,66,0.60);
+  margin-bottom:28px;
+}
+.hero-verse{
+  font-family:'Noto Serif KR',serif;
+  font-size:clamp(0.76rem,1.6vw,0.90rem);
+  color:var(--muted);font-style:italic;line-height:2.0;
+  max-width:400px;
+  border-left:2px solid rgba(245,200,66,0.30);
+  padding-left:18px;text-align:left;
+}
+.hero-desc{
+  margin-top:28px;
+  font-size:clamp(0.78rem,1.6vw,0.90rem);
+  color:var(--muted);line-height:2.0;max-width:480px;
+}
+.scroll-hint{
+  margin-top:48px;
+  font-family:'Cinzel',serif;font-size:0.64rem;
+  letter-spacing:0.24em;color:rgba(245,200,66,0.40);
+  animation:scrollPulse 2.8s ease-in-out infinite;
+}
+@keyframes scrollPulse{0%,100%{opacity:0.35;transform:translateY(0);}50%{opacity:0.85;transform:translateY(7px);}}
+
+/* ── SECTION WRAPPER ── */
+.section{
+  background:var(--bg);
+  padding:80px 24px;
+}
+.section-inner{max-width:1120px;margin:0 auto;}
+.section-header{text-align:center;margin-bottom:52px;}
+.eyebrow{
+  font-family:'Cinzel',serif;
+  font-size:clamp(0.58rem,1.2vw,0.68rem);
+  letter-spacing:0.38em;color:var(--gold);opacity:0.85;
+  text-transform:uppercase;display:block;margin-bottom:12px;
+}
+.section-h2{
+  font-family:'Cinzel',serif;
+  font-size:clamp(1.6rem,4vw,2.8rem);
+  font-weight:700;color:#fff;letter-spacing:0.05em;
+  text-shadow:0 0 40px rgba(245,200,66,0.18);
+  margin-bottom:14px;
+}
+.divider{
+  width:56px;height:2px;margin:0 auto 18px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.section-desc{
+  font-size:clamp(0.80rem,1.6vw,0.92rem);
+  color:rgba(250,235,208,0.78);line-height:1.9;
+  max-width:460px;margin:0 auto;
+}
+.sub-label{
+  font-family:'Cinzel',serif;
+  font-size:0.66rem;letter-spacing:0.28em;
+  color:rgba(245,200,66,0.55);text-transform:uppercase;
+  margin-bottom:18px;display:block;
+}
+
+/* ── CARD GRID ── */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));
+  gap:20px;
+}
+
+/* ── CARD ── */
+.card{
+  display:flex;flex-direction:column;
+  background:linear-gradient(160deg,#13111f 0%,#0c0a18 100%);
+  border:1px solid rgba(245,200,66,0.10);
+  border-radius:12px;overflow:hidden;
+  text-decoration:none;color:inherit;
+  transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  position:relative;
+}
+.card::before{
+  content:'';
+  position:absolute;inset:0;border-radius:12px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(245,200,66,0.10) 0%,transparent 65%);
+  opacity:0;transition:opacity 0.3s;pointer-events:none;
+}
+.card:hover{
+  transform:translateY(-7px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.65), 0 0 0 1px rgba(245,200,66,0.32);
+  border-color:rgba(245,200,66,0.35);
+}
+.card:hover::before{opacity:1;}
+.card-locked{opacity:0.5;cursor:default;}
+.card-locked:hover{transform:none;box-shadow:none;border-color:rgba(245,200,66,0.10);}
+.card-locked:hover::before{opacity:0;}
+
+/* ── CARD VISUAL (썸네일 대신) ── */
+.card-visual{
+  width:100%;aspect-ratio:16/9;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#1a1628 0%,#0a0816 100%);
+}
+.card-visual-locked{background:linear-gradient(135deg,#141220 0%,#09070f 100%);}
+.card-emoji{
+  font-size:clamp(2.4rem,4vw,3.2rem);
+  filter:drop-shadow(0 0 18px rgba(245,200,66,0.40));
+  animation:emojiFloat 4s ease-in-out infinite;
+  animation-delay:var(--delay,0s);
+}
+@keyframes emojiFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-8px) scale(1.05);}}
+.card-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 110%,rgba(245,200,66,0.12) 0%,transparent 65%);
+  pointer-events:none;
+}
+.lock-mark{
+  position:absolute;bottom:10px;right:12px;
+  font-size:1.1rem;opacity:0.38;
+}
+
+/* ── CARD BODY ── */
+.card-body{
+  padding:16px 18px 20px;
+  flex:1;display:flex;flex-direction:column;gap:6px;
+}
+.ep-num{
+  font-family:'Cinzel',serif;
+  font-size:0.60rem;letter-spacing:0.22em;color:var(--gold);opacity:0.80;
+}
+.card-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(0.92rem,2vw,1.06rem);
+  font-weight:700;color:#fff;
+  letter-spacing:0.03em;line-height:1.3;
+}
+.card-verse{
+  font-family:'Cinzel',serif;
+  font-size:0.62rem;letter-spacing:0.10em;
+  color:rgba(245,200,66,0.55);
+}
+.card-desc{
+  font-size:clamp(0.74rem,1.4vw,0.82rem);
+  color:var(--muted);line-height:1.75;flex:1;
+}
+.play-btn{
+  display:inline-block;margin-top:12px;
+  font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.14em;
+  color:#120a02;background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+  padding:7px 16px;border-radius:3px;align-self:flex-start;
+  transition:box-shadow 0.2s,transform 0.15s;
+}
+.card:hover .play-btn{
+  box-shadow:0 4px 16px rgba(245,200,66,0.5);
+  transform:translateX(3px);
+}
+
+/* ── NT SECTION ── */
+.section-nt{
+  background:linear-gradient(180deg,var(--bg) 0%,#0a051e 50%,var(--bg) 100%);
+}
+.nt-badge{
+  display:inline-block;
+  font-family:'Cinzel',serif;font-size:0.60rem;letter-spacing:0.24em;
+  color:rgba(245,200,66,0.55);
+  border:1px solid rgba(245,200,66,0.18);
+  padding:5px 14px;border-radius:20px;margin-bottom:14px;
+}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--bg);
+  border-top:1px solid rgba(245,200,66,0.08);
+  text-align:center;padding:52px 24px;
+}
+.footer-verse{
+  font-size:clamp(0.76rem,1.5vw,0.86rem);
+  color:var(--muted);font-style:italic;line-height:2.1;
+}
+.footer-copy{
+  margin-top:14px;font-size:0.64rem;
+  color:rgba(255,255,255,0.20);letter-spacing:0.12em;
+}
+
+/* ── 반응형 ── */
+@media(max-width:600px){
+  .section{padding:60px 16px;}
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .card-body{padding:12px 14px 16px;}
+  .card-emoji{font-size:2rem;}
+  .card-title{font-size:0.88rem;}
+  .card-desc{font-size:0.72rem;}
+  .play-btn{font-size:0.62rem;padding:6px 12px;}
+}
+@media(max-width:360px){
+  .grid{grid-template-columns:1fr;}
+  h1.hero-title{font-size:2.2rem;}
+}
+@media(max-height:500px) and (orientation:landscape){
+  #hero{min-height:auto;padding:36px 24px 50px;}
+  .hero-emblem{font-size:2.8rem;margin-bottom:10px;}
+  .grid{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="stars" id="stars"></div>
+  <div class="hero-emblem">🦌</div>
+  <div class="hero-label">Bible Story Simulation</div>
+  <h1 class="hero-title">목마른 사슴</h1>
+  <div class="hero-sub">성경 이야기 시뮬레이션</div>
+  <blockquote class="hero-verse">
+    "하나님이여 사슴이 시냇물을 찾기에 갈급함 같이<br>
+    내 영혼이 주를 찾기에 갈급하니이다"
+    <cite style="font-size:0.70rem;opacity:0.60;font-style:normal;display:block;margin-top:8px;">— 시편 42:1</cite>
+  </blockquote>
+  <p class="hero-desc">
+    성경 속 인물들의 갈림길에 서보세요.<br>
+    그들의 두려움, 분노, 믿음을 함께 경험하며<br>
+    하나님의 이야기 안으로 걸어 들어갑니다.
+  </p>
+  <div class="scroll-hint">↓ &nbsp; 에피소드 보기</div>
+</section>
+
+<!-- 구약 -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="eyebrow">Old Testament</span>
+      <h2 class="section-h2">구약성경</h2>
+      <div class="divider"></div>
+      <p class="section-desc">믿음의 선조들이 하나님 앞에서 내린 선택들</p>
+    </div>
+    <div class="grid">
+      <a href="red_sea_miracle_v3.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#1a3a6a 0%,#0a1a3a 100%);">
+            <span class="card-emoji">🌊</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.01</span>
+            <h3 class="card-title">홍해의 기적</h3>
+            <p class="card-verse">출애굽기 14장</p>
+            <p class="card-desc">두려움과 믿음 사이, 모세가 지팡이를 들었다</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+<a href="abraham_ep2.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#3a1a0a 0%,#1a0a00 100%);">
+            <span class="card-emoji">🔥</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.02</span>
+            <h3 class="card-title">아브라함의 믿음</h3>
+            <p class="card-verse">창세기 22장</p>
+            <p class="card-desc">가장 소중한 것을 내려놓을 수 있는가</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+<a href="jacob_ep3.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#0a1a3a 0%,#050e22 100%);">
+            <span class="card-emoji">🌙</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.03</span>
+            <h3 class="card-title">야곱의 씨름</h3>
+            <p class="card-verse">창세기 32-33장</p>
+            <p class="card-desc">밤새 하나님과 씨름한 한 사람</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+<a href="joseph_ep4.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#1a2a0a 0%,#0a1600 100%);">
+            <span class="card-emoji">👑</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.04</span>
+            <h3 class="card-title">요셉의 용서</h3>
+            <p class="card-verse">창세기 45장</p>
+            <p class="card-desc">복수 대신 용서를 선택한 순간</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+<a href="gideon_ep5.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#2a1a00 0%,#160d00 100%);">
+            <span class="card-emoji">📯</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.05</span>
+            <h3 class="card-title">기드온의 300용사</h3>
+            <p class="card-verse">사사기 7장</p>
+            <p class="card-desc">300명으로 대군을 무너뜨린 하나님의 방법</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+<a href="moses_ep6.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#1a0a00 0%,#0e0500 100%);">
+            <span class="card-emoji">📜</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.06</span>
+            <h3 class="card-title">모세와 금송아지</h3>
+            <p class="card-verse">출애굽기 32장</p>
+            <p class="card-desc">분노와 중보 사이에서 선 모세</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+<a href="david_ep7.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#0a1a1a 0%,#05100e 100%);">
+            <span class="card-emoji">🗡️</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.07</span>
+            <h3 class="card-title">다윗과 사울</h3>
+            <p class="card-verse">사무엘상 24장</p>
+            <p class="card-desc">복수할 기회를 옷자락 하나로 내려놓다</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+<a href="elijah_ep8.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#1a0a2a 0%,#0d0516 100%);">
+            <span class="card-emoji">🍞</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.08</span>
+            <h3 class="card-title">엘리야와 로뎀나무</h3>
+            <p class="card-verse">열왕기상 19장</p>
+            <p class="card-desc">지쳐 쓰러진 그 자리에 천사가 왔다</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+<a href="jonah_ep9.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#001a1a 0%,#000e0e 100%);">
+            <span class="card-emoji">🐟</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.09</span>
+            <h3 class="card-title">요나와 니느웨</h3>
+            <p class="card-verse">요나서</p>
+            <p class="card-desc">도망친 선지자와 하나님의 끈질긴 긍휼</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+<a href="job_ep10.html" class="card">
+          <div class="card-visual" style="background:linear-gradient(135deg,#1a1000 0%,#0e0800 100%);">
+            <span class="card-emoji">📖</span>
+            <div class="card-glow"></div>
+          </div>
+          <div class="card-body">
+            <span class="ep-num">EP.10</span>
+            <h3 class="card-title">욥의 고난</h3>
+            <p class="card-verse">욥기 1-2장</p>
+            <p class="card-desc">정직하게 하나님 앞에 선 사람</p>
+            <span class="play-btn">▶ 시작하기</span>
+          </div>
+        </a>
+    </div>
+  </div>
+</section>
+
+<!-- 신약 -->
+<section class="section section-nt">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="nt-badge">Coming Soon</div>
+      <span class="eyebrow">New Testament</span>
+      <h2 class="section-h2">신약성경</h2>
+      <div class="divider"></div>
+      <p class="section-desc">예수님과 제자들의 이야기, 곧 찾아옵니다</p>
+    </div>
+    <div class="grid">
+      <div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">🕊️</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.01</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">예수님의 세례</h3>
+            <p class="card-verse" style="opacity:0.3;">마태복음 3장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+<div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">⚡</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.02</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">광야의 시험</h3>
+            <p class="card-verse" style="opacity:0.3;">마태복음 4장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+<div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">🌊</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.03</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">물 위를 걷는 베드로</h3>
+            <p class="card-verse" style="opacity:0.3;">마태복음 14장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+<div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">🏠</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.04</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">탕자의 귀환</h3>
+            <p class="card-verse" style="opacity:0.3;">누가복음 15장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+<div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">🌳</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.05</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">삭개오</h3>
+            <p class="card-verse" style="opacity:0.3;">누가복음 19장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+<div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">🙏</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.06</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">겟세마네의 기도</h3>
+            <p class="card-verse" style="opacity:0.3;">마태복음 26장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+<div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">✨</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.07</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">부활의 아침</h3>
+            <p class="card-verse" style="opacity:0.3;">요한복음 20장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+<div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">🔥</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.08</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">오순절 성령 강림</h3>
+            <p class="card-verse" style="opacity:0.3;">사도행전 2장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+<div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">💡</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.09</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">사울의 회심</h3>
+            <p class="card-verse" style="opacity:0.3;">사도행전 9장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+<div class="card card-locked">
+          <div class="card-visual card-visual-locked">
+            <span class="card-emoji" style="opacity:0.22;">📖</span>
+            <span class="lock-mark">🔒</span>
+          </div>
+          <div class="card-body">
+            <span class="ep-num" style="opacity:0.35;">NT.10</span>
+            <h3 class="card-title" style="color:rgba(255,255,255,0.30);">요한의 계시</h3>
+            <p class="card-verse" style="opacity:0.3;">요한계시록 1장</p>
+            <p class="card-desc" style="color:rgba(255,255,255,0.20);">Coming Soon</p>
+          </div>
+        </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p style="font-size:1.8rem;margin-bottom:14px;">🦌</p>
+  <p class="footer-verse">
+    "내 영혼아 네가 어찌하여 낙심하며 어찌하여 내 속에서 불안해 하는가<br>
+    너는 하나님께 소망을 두라" — 시편 42:5
+  </p>
+  <p class="footer-copy">© 목마른 사슴 · Bible Story Simulation</p>
+</footer>
+
+<script>
+// 별 생성
+(function(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<110;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=0.8+Math.random()*2.2;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${1.8+Math.random()*4.5}s;--o:${0.15+Math.random()*0.65};--delay:${Math.random()*6}s;`;
+    c.appendChild(s);
+  }
+})();
+
+// 카드 이모지 딜레이 부여
+document.querySelectorAll('.card-emoji').forEach((el,i)=>{
+  el.style.setProperty('--delay', (i*0.18)+'s');
+});
+
+// 등장 애니메이션
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>{
+        e.target.style.opacity = e.target.classList.contains('card-locked')?'0.5':'1';
+        e.target.style.transform='translateY(0)';
+      },i*55);
+      obs.unobserve(e.target);
+    }
+  });
+},{threshold:0.06});
+
+document.querySelectorAll('.card').forEach((el,i)=>{
+  el.style.opacity='0';
+  el.style.transform='translateY(22px)';
+  el.style.transition=`opacity 0.5s ease ${i*0.04}s, transform 0.5s ease ${i*0.04}s, box-shadow 0.22s, border-color 0.22s`;
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
